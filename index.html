@@ -202,7 +202,7 @@
         th {
             background-color: rgba(239, 68, 68, 0.08);
             color: #dc2626;
-            padding: 12px 4px;
+            padding: 12px 2px;
             font-size: 13px;
             font-weight: 800;
             border-bottom: 1.5px solid #e5e7eb;
@@ -215,7 +215,7 @@
         }
 
         td {
-            padding: 12px 4px;
+            padding: 12px 2px;
             font-size: 12px;
             color: #374151;
             border-bottom: 1px solid #f3f4f6;
@@ -240,7 +240,7 @@
             background-color: #ef4444;
             color: white;
             border: none;
-            padding: 6px 10px;
+            padding: 6px 8px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 11px;
@@ -394,11 +394,11 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <!-- তারিখ কলামের জায়গা বাড়িয়ে দেওয়া হলো -->
-                        <th style="width: 38%;">তারিখ</th>
+                        <!-- তারিখ কলামের জায়গা 42% করা হলো যাতে কোনোভাবেই লাইন না ভাঙে -->
+                        <th style="width: 42%;">তারিখ</th>
                         <th style="width: 25%;">রান্না হ্যাঁ/না</th>
-                        <th style="width: 17%;">নাম</th>
-                        <th style="width: 20%;">অ্যাকশন</th>
+                        <th style="width: 15%;">নাম</th>
+                        <th style="width: 18%;">অ্যাকশন</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -641,12 +641,12 @@
             records.forEach((data, index) => {
                 const row = document.createElement('tr');
 
-                // white-space: nowrap এবং ফন্ট সাইজ ১১px ব্যবহার করে PM নিছে নামা বন্ধ করা হলো
+                // nowrap এবং ফন্ট সাইজ 10.5px দেওয়া হয়েছে, যাতে কোনোভাবেই না ভাঙে
                 row.innerHTML = `
-                    <td style="white-space: nowrap; font-size: 11px; padding: 12px 2px;">${data.formattedDate || '-'}</td>
-                    <td>${data.day ? data.day + ' (' + data.cookStatus + ')' : data.cookStatus}</td>
-                    <td>${data.name}</td>
-                    <td>
+                    <td style="white-space: nowrap; font-size: 10.5px; padding: 12px 2px;">${data.formattedDate || '-'}</td>
+                    <td style="font-size: 11px; padding: 12px 2px;">${data.day ? data.day + ' (' + data.cookStatus + ')' : data.cookStatus}</td>
+                    <td style="font-size: 12px; padding: 12px 2px;">${data.name}</td>
+                    <td style="padding: 12px 2px;">
                         <button class="delete-btn" onclick="deleteRecord('${data.id}')">ডিলিট</button>
                     </td>
                 `;
