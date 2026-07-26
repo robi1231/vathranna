@@ -146,14 +146,16 @@
             background: transparent;
             border-top: 1.5px solid #e5e7eb;
             padding: 0;
-            overflow-x: auto;
+            width: 100%;
+            overflow-x: hidden; /* স্ক্রোলবার পুরোপুরি বন্ধ করা হলো */
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: center;
-            min-width: 480px;
+            min-width: 100%; /* মোবাইলে ফিট করার জন্য min-width 100% করা হলো */
+            table-layout: fixed; /* কলামের সাইজ সামঞ্জস্যপূর্ণ রাখতে */
             background: transparent;
         }
 
@@ -161,11 +163,12 @@
         th {
             background-color: rgba(239, 68, 68, 0.08);
             color: #dc2626;
-            padding: 14px 10px;
-            font-size: 14px;
+            padding: 10px 4px;
+            font-size: 12px;
             font-weight: 800;
             border-bottom: 1.5px solid #e5e7eb;
             border-right: 1px solid #f3f4f6;
+            word-wrap: break-word;
         }
 
         th:last-child {
@@ -174,12 +177,13 @@
 
         /* ট্রান্সপারেন্ট টেবিল রো */
         td {
-            padding: 12px 10px;
-            font-size: 13px;
+            padding: 10px 4px;
+            font-size: 11px;
             color: #374151;
             border-bottom: 1px solid #f3f4f6;
             border-right: 1px solid #f3f4f6;
             background-color: transparent;
+            word-wrap: break-word;
         }
 
         td:last-child {
@@ -198,10 +202,10 @@
             background-color: #ef4444;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 5px 8px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             transition: background 0.2s;
         }
@@ -322,10 +326,10 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th>তারিখ</th>
-                        <th>রান্না হ্যাঁ/না</th>
-                        <th>নাম</th>
-                        <th>অ্যাকশন</th>
+                        <th style="width: 35%;">তারিখ</th>
+                        <th style="width: 27%;">রান্না হ্যাঁ/না</th>
+                        <th style="width: 18%;">নাম</th>
+                        <th style="width: 20%;">অ্যাকশন</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -470,7 +474,7 @@
             const dayInput = document.getElementById('day').value;
             const selectedName = nameSelect.value;
 
-            // সাবমিটের সময় বর্তমান রিয়েল-টাইম ডেট-টাইম অটো জেনারেট করা হচ্ছে
+            // সাবমিটের সময় বর্তমান রিয়েল-টাইম ডেট-টাইম অটো জেনারেট করা হচ্ছে
             const dateObj = new Date();
             const formattedDate = dateObj.toLocaleDateString('en-GB') + ' ' + 
                                   dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
