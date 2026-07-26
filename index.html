@@ -17,8 +17,32 @@
             min-height: 100vh;
             padding: 15px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ✨ অ্যাকর্ডিয়ন / ড্রপডাউন মেনু বাটন ✨ */
+        .main-toggle-btn {
+            width: 100%;
+            max-width: 750px;
+            background: #1a237e;
+            color: white;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .main-toggle-btn:hover {
+            background: #283593;
         }
 
         /* মূল স্মার্ট কার্ড container */
@@ -29,8 +53,25 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(26, 35, 126, 0.12);
             overflow: hidden;
-            margin: 10px auto;
+            margin: 15px auto;
             border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* ফর্মের কার্ড - যা লুকানো থাকবে */
+        #appCard {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* টেবিলের কার্ড - যা সবসময় দৃশ্যমান থাকবে */
+        .table-card {
+            display: block;
+            margin-top: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ফর্ম সেকশন */
@@ -75,7 +116,7 @@
             margin-bottom: 6px;
         }
 
-        input[type="datetime-local"], select {
+        input[type="datetime-local"], input[type="number"], select {
             width: 100%;
             padding: 12px 14px;
             border: 1.5px solid #d1d5db;
@@ -144,7 +185,6 @@
         /* ✨ ট্রান্সপারেন্ট টেবিল সেকশন ✨ */
         .table-section {
             background: transparent;
-            border-top: 1.5px solid #e5e7eb;
             padding: 0;
             width: 100%;
             overflow-x: hidden;
@@ -159,12 +199,11 @@
             background: transparent;
         }
 
-        /* ট্রান্সপারেন্ট হেডার (লাল টেক্সট) */
         th {
             background-color: rgba(239, 68, 68, 0.08);
             color: #dc2626;
-            padding: 10px 4px;
-            font-size: 12px;
+            padding: 12px 4px;
+            font-size: 13px;
             font-weight: 800;
             border-bottom: 1.5px solid #e5e7eb;
             border-right: 1px solid #f3f4f6;
@@ -175,10 +214,9 @@
             border-right: none;
         }
 
-        /* ট্রান্সপারেন্ট টেবিল রো */
         td {
-            padding: 10px 4px;
-            font-size: 11px;
+            padding: 12px 4px;
+            font-size: 12px;
             color: #374151;
             border-bottom: 1px solid #f3f4f6;
             border-right: 1px solid #f3f4f6;
@@ -202,16 +240,26 @@
             background-color: #ef4444;
             color: white;
             border: none;
-            padding: 5px 8px;
+            padding: 6px 10px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 600;
             transition: background 0.2s;
         }
 
         .delete-btn:hover {
             background-color: #dc2626;
+        }
+        
+        /* গ্যাপ রো স্টাইল (সাইকেল শেষ হওয়ার পর) */
+        .gap-row td {
+            background-color: #f59e0b !important;
+            color: #fff;
+            font-weight: bold;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            padding: 8px;
         }
 
         /* মোডাল স্টাইল */
@@ -235,6 +283,14 @@
             width: 100%;
             max-width: 380px;
             box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+        }
+        
+        .setup-section {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e5e7eb;
         }
 
         .name-item {
@@ -260,17 +316,27 @@
 
         .btn-edit { background: #f59e0b; }
         .btn-del { background: #ef4444; }
+        .btn-save { background: #3f51b5; width: 100%; padding: 8px; margin-top: 8px; font-size: 12px; }
         .btn-add { background: #10b981; width: 100%; padding: 10px; margin-top: 12px; font-weight: 700; font-size: 13px; }
         .btn-close { background: #6b7280; width: 100%; padding: 10px; margin-top: 6px; font-weight: 700; font-size: 13px; }
+
+        select option {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <div class="app-card">
-        
-        <!-- ইনপুট ফর্ম -->
+    <!-- ড্রপডাউন বাটন (শুধুমাত্র ফর্মের জন্য) -->
+    <button class="main-toggle-btn" onclick="toggleApp()">
+        <span>রান্নার এন্ট্রি ফর্ম</span>
+        <span id="toggleIcon">▼</span>
+    </button>
+
+    <!-- লুকানো ফর্ম কার্ড -->
+    <div class="app-card" id="appCard">
         <div class="form-section">
-            <h2 class="app-title">রান্নার এন্ট্রি ফর্ম</h2>
+            <h2 class="app-title">নতুন রান্নার হিসাব</h2>
             
             <form id="cookingForm">
                 <div class="form-grid">
@@ -320,8 +386,10 @@
                 </div>
             </form>
         </div>
+    </div>
 
-        <!-- ট্রান্সপারেন্ট টেবিল -->
+    <!-- সবসময় দৃশ্যমান টেবিল কার্ড -->
+    <div class="app-card table-card">
         <div class="table-section">
             <table id="dataTable">
                 <thead>
@@ -337,14 +405,23 @@
                 </tbody>
             </table>
         </div>
-
     </div>
 
-    <!-- নাম ম্যানেজ করার মোডাল -->
+    <!-- নাম ও সাইকেল ম্যানেজ করার মোডাল -->
     <div id="nameModal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0; text-align:center; color:#1a237e;">নামের তালিকা নিয়ন্ত্রণ</h3>
-            <div id="nameListContainer" style="max-height: 250px; overflow-y: auto; margin-top: 10px;"></div>
+            <h3 style="margin-top:0; text-align:center; color:#1a237e; margin-bottom: 15px;">সেটিংস প্যানেল</h3>
+            
+            <!-- সাইকেল সেটআপ (ডাইনামিক গ্যাপ এবং লাল রঙের জন্য) -->
+            <div class="setup-section">
+                <label style="font-size: 13px; font-weight: 700; color: #374151;">সাইকেলের দিন (১-১৫):</label>
+                <input type="number" id="cycleDurationInput" min="1" max="15" value="6">
+                <button type="button" class="btn-sm btn-save" onclick="saveCycleDuration()">সেভ করুন</button>
+            </div>
+
+            <h4 style="color: #374151; border-bottom: 1px solid #ccc; padding-bottom: 5px;">নামের তালিকা</h4>
+            <div id="nameListContainer" style="max-height: 200px; overflow-y: auto; margin-top: 10px;"></div>
+            
             <button type="button" class="btn-sm btn-add" onclick="addNewName()">+ নতুন নাম যোগ করুন</button>
             <button type="button" class="btn-close" onclick="closeNameManager()">বন্ধ করুন</button>
         </div>
@@ -372,43 +449,32 @@
         // 🔒 সিকিউরিটি পাসওয়ার্ড
         const MASTER_PASSWORD = "123";
 
-        // ডিফল্ট নামের তালিকা
-        let names = ['রবি', 'নাদিম', 'সাদিক', 'তানজিল', 'বশির'];
+        // ডিফল্ট নামের তালিকা ও সাইকেল ডিউরেশন
+        let names = JSON.parse(localStorage.getItem('cookingNames')) || ['রবি', 'নাদিম', 'সাদিক', 'তানজিল', 'বশির'];
+        let cycleDuration = parseInt(localStorage.getItem('cookingCycleDuration')) || 6;
+        let allRecords = []; 
 
         const cookingForm = document.getElementById('cookingForm');
         const tableBody = document.querySelector('#dataTable tbody');
         const nameSelect = document.getElementById('nameSelect');
-
-        // 🔥 নতুন: ডাটাবেস থেকে রিয়েল-টাইমে নামগুলো লোড করা
-        db.collection('settings').doc('name_list').onSnapshot((doc) => {
-            if (doc.exists) {
-                names = doc.data().namesArray || [];
-            } else {
-                // প্রথমবার ডাটাবেসে ডিফল্ট নামগুলো সেভ করা
-                updateNamesInDB();
-            }
-            
-            renderNameDropdown();
-            // মোডাল খোলা থাকলে লিস্ট রিয়েল-টাইমে আপডেট হবে
-            if (document.getElementById('nameModal').style.display === 'flex') {
-                renderNameList();
-            }
-        });
-
-        // 🔥 নতুন: ডাটাবেসে নাম আপডেট করার ফাংশন
-        async function updateNamesInDB() {
-            try {
-                await db.collection('settings').doc('name_list').set({
-                    namesArray: names
-                });
-            } catch (error) {
-                console.error('নাম ডাটাবেসে সেভ করতে সমস্যা: ', error);
-            }
-        }
+        const appCard = document.getElementById('appCard');
+        const toggleIcon = document.getElementById('toggleIcon');
 
         window.onload = function() {
             setInitialDateTime();
+            renderNameDropdown();
         };
+
+        // ড্রপডাউন (অ্যাকর্ডিয়ন) টগল ফাংশন
+        function toggleApp() {
+            if (appCard.style.display === "none" || appCard.style.display === "") {
+                appCard.style.display = "block";
+                toggleIcon.innerText = "▲";
+            } else {
+                appCard.style.display = "none";
+                toggleIcon.innerText = "▼";
+            }
+        }
 
         function setInitialDateTime() {
             const now = new Date();
@@ -416,15 +482,39 @@
             document.getElementById('dateTime').value = now.toISOString().slice(0, 16);
         }
 
-        // ড্রপডাউন তৈরি করা
         function renderNameDropdown() {
-            nameSelect.innerHTML = '<option value="">নাম নির্বাচন করুন</option>';
+            nameSelect.innerHTML = '<option value="" style="color: black;">নাম নির্বাচন করুন</option>';
+            const now = new Date();
+
             names.forEach(name => {
+                const lastCooked = allRecords.find(record => record.name === name && record.cookStatus === 'হ্যাঁ');
+                let isRed = false;
+
+                if (lastCooked && lastCooked.createdAt) {
+                    const lastDate = lastCooked.createdAt.toDate();
+                    const diffTime = Math.abs(now - lastDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if(diffDays > cycleDuration) {
+                        isRed = true;
+                    }
+                } else if (!lastCooked && allRecords.length > 0) {
+                    isRed = true;
+                }
+
                 const opt = document.createElement('option');
                 opt.value = name;
                 opt.textContent = name;
+                
+                if (isRed) {
+                    opt.style.color = '#ef4444';
+                } else {
+                    opt.style.color = '#1f2937'; 
+                }
+                
                 nameSelect.appendChild(opt);
             });
+            localStorage.setItem('cookingNames', JSON.stringify(names));
         }
 
         function authenticate() {
@@ -439,6 +529,7 @@
 
         function openNameManager() {
             if (!authenticate()) return;
+            document.getElementById('cycleDurationInput').value = cycleDuration;
             renderNameList();
             document.getElementById('nameModal').style.display = 'flex';
         }
@@ -446,6 +537,19 @@
         function closeNameManager() {
             document.getElementById('nameModal').style.display = 'none';
             renderNameDropdown();
+        }
+        
+        function saveCycleDuration() {
+            const val = parseInt(document.getElementById('cycleDurationInput').value);
+            if(val >= 1 && val <= 15) {
+                cycleDuration = val;
+                localStorage.setItem('cookingCycleDuration', cycleDuration);
+                alert(`সাইকেল ${cycleDuration} দিনের জন্য সেট করা হয়েছে!`);
+                renderTableData(allRecords); 
+                renderNameDropdown(); 
+            } else {
+                alert("দয়া করে ১ থেকে ১৫ এর মধ্যে একটি সংখ্যা দিন।");
+            }
         }
 
         function renderNameList() {
@@ -469,7 +573,7 @@
             const newName = prompt("নতুন নাম লিখুন:");
             if (newName && newName.trim() !== "") {
                 names.push(newName.trim());
-                updateNamesInDB(); // 🔥 ডাটাবেসে সেভ করা হচ্ছে
+                renderNameList();
             }
         }
 
@@ -477,18 +581,17 @@
             const updatedName = prompt("নাম পরিবর্তন করুন:", names[index]);
             if (updatedName && updatedName.trim() !== "") {
                 names[index] = updatedName.trim();
-                updateNamesInDB(); // 🔥 ডাটাবেসে সেভ করা হচ্ছে
+                renderNameList();
             }
         }
 
         function deleteName(index) {
             if (confirm(`আপনি কি "${names[index]}" নাম মুছে ফেলতে চান?`)) {
                 names.splice(index, 1);
-                updateNamesInDB(); // 🔥 ডাটাবেসে সেভ করা হচ্ছে
+                renderNameList();
             }
         }
 
-        // ১. ডাটা সেভ (অটোমেটিক রিয়েল-টাইম ডেট ও টাইম সহ)
         cookingForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -500,7 +603,6 @@
             const dayInput = document.getElementById('day').value;
             const selectedName = nameSelect.value;
 
-            // সাবমিটের সময় বর্তমান রিয়েল-টাইম ডেট-টাইম অটো জেনারেট করা হচ্ছে
             const dateObj = new Date();
             const formattedDate = dateObj.toLocaleDateString('en-GB') + ' ' + 
                                   dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -525,36 +627,56 @@
             }
         });
 
-        // ২. ডাটাবেস থেকে টেবিলে লাইভ ভিউ
+        function renderTableData(records) {
+            tableBody.innerHTML = '';
+
+            if (records.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" style="color: #6b7280; padding: 20px;">কোন তথ্য পাওয়া যায়নি</td></tr>`;
+                return;
+            }
+
+            let entryCount = 0;
+
+            records.forEach((data, index) => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${data.formattedDate || '-'}</td>
+                    <td>${data.day ? data.day + ' (' + data.cookStatus + ')' : data.cookStatus}</td>
+                    <td>${data.name}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteRecord('${data.id}')">ডিলিট</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+
+                entryCount++;
+                
+                if (entryCount % cycleDuration === 0 && entryCount !== records.length) {
+                    const gapRow = document.createElement('tr');
+                    gapRow.className = 'gap-row';
+                    gapRow.innerHTML = `<td colspan="4">--- ${cycleDuration} দিনের সাইকেল সম্পন্ন ---</td>`;
+                    tableBody.appendChild(gapRow);
+                }
+            });
+        }
+
         db.collection('cooking_sheet_records')
           .orderBy('createdAt', 'desc')
           .onSnapshot((snapshot) => {
-              tableBody.innerHTML = '';
-
-              if (snapshot.empty) {
-                  tableBody.innerHTML = `<tr><td colspan="4" style="color: #6b7280; padding: 20px;">কোন তথ্য পাওয়া যায়নি</td></tr>`;
-                  return;
-              }
-
+              allRecords = [];
               snapshot.forEach((doc) => {
-                  const data = doc.data();
-                  const row = document.createElement('tr');
-
-                  row.innerHTML = `
-                      <td>${data.formattedDate || '-'}</td>
-                      <td>${data.day ? data.day + ' (' + data.cookStatus + ')' : data.cookStatus}</td>
-                      <td>${data.name}</td>
-                      <td>
-                          <button class="delete-btn" onclick="deleteRecord('${doc.id}')">ডিলিট</button>
-                      </td>
-                  `;
-                  tableBody.appendChild(row);
+                  let docData = doc.data();
+                  docData.id = doc.id; 
+                  allRecords.push(docData);
               });
+              
+              renderTableData(allRecords);
+              renderNameDropdown(); 
           }, (error) => {
               console.error("ডাটা লোড করতে সমস্যা: ", error);
           });
 
-        // ৩. ডিলিট করা
         async function deleteRecord(id) {
             if (authenticate()) {
                 try {
