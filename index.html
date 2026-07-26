@@ -343,7 +343,7 @@
                     
                     <div class="form-group full-width">
                         <label for="dateTime">তারিখ ও সময়:</label>
-                        <!-- readonly এবং disabled স্টাইল রিমুভ করা হয়েছে যাতে ইউজার এডিট করতে পারে -->
+                        <!-- readonly রিমুভ করা হয়েছে যাতে ইউজার এডিট করতে পারে -->
                         <input type="datetime-local" id="dateTime" required>
                     </div>
 
@@ -446,8 +446,9 @@
         const db = firebase.firestore();
         const MASTER_PASSWORD = "123";
 
-        let names = JSON.parse(localStorage.getItem('cookingNames')) || ['রবি', 'নাদিম', 'সাদিক', 'তানজিল', 'বশির'];
-        let cycleDuration = parseInt(localStorage.getItem('cookingCycleDuration')) || 6;
+        // ডিফল্ট ভ্যালু (ডাটাবেস থেকে লোড হবে)
+        let names = ['রবি', 'নাদিম', 'সাদিক', 'তানজিল', 'বশির'];
+        let cycleDuration = 6;
         let allRecords = []; 
 
         const cookingForm = document.getElementById('cookingForm');
@@ -458,8 +459,43 @@
 
         window.onload = function() {
             setInitialDateTime();
-            renderNameDropdown();
         };
+
+        // ডাটাবেস থেকে রিয়েল-টাইমে সেটিংস (নাম এবং সাইকেল) লোড করা
+        db.collection('app_settings').doc('general_config').onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                if (data.names) names = data.names;
+                if (data.cycleDuration) cycleDuration = data.cycleDuration;
+            } else {
+                // ডাটাবেসে সেটিংস না থাকলে প্রথমবার সেভ করা হচ্ছে
+                db.collection('app_settings').doc('general_config').set({
+                    names: names,
+                    cycleDuration: cycleDuration
+                });
+            }
+            
+            // ডাটাবেস আপডেট হওয়ার সাথে সাথে UI আপডেট হবে
+            renderNameDropdown();
+            if (allRecords.length > 0) renderTableData(allRecords);
+            
+            if (document.getElementById('nameModal').style.display === 'flex') {
+                renderNameList();
+                document.getElementById('cycleDurationInput').value = cycleDuration;
+            }
+        });
+
+        // সেটিংস ডাটাবেসে সেভ করার ফাংশন
+        async function saveSettingsToDB() {
+            try {
+                await db.collection('app_settings').doc('general_config').set({
+                    names: names,
+                    cycleDuration: cycleDuration
+                }, { merge: true });
+            } catch (error) {
+                alert('ডাটাবেসে সেটিংস সেভ করতে সমস্যা হয়েছে: ' + error.message);
+            }
+        }
 
         function toggleApp() {
             if (appCard.style.display === "none" || appCard.style.display === "") {
@@ -509,7 +545,6 @@
                 
                 nameSelect.appendChild(opt);
             });
-            localStorage.setItem('cookingNames', JSON.stringify(names));
         }
 
         function authenticate() {
@@ -531,17 +566,14 @@
 
         function closeNameManager() {
             document.getElementById('nameModal').style.display = 'none';
-            renderNameDropdown();
         }
         
         function saveCycleDuration() {
             const val = parseInt(document.getElementById('cycleDurationInput').value);
             if(val >= 1 && val <= 15) {
                 cycleDuration = val;
-                localStorage.setItem('cookingCycleDuration', cycleDuration);
-                alert(`সাইকেল ${cycleDuration} দিনের জন্য সেট করা হয়েছে!`);
-                renderTableData(allRecords); 
-                renderNameDropdown(); 
+                saveSettingsToDB(); // ডাটাবেসে সেভ হচ্ছে
+                alert(`সাইকেল ${cycleDuration} দিনের জন্য ডাটাবেসে সেভ করা হয়েছে!`);
             } else {
                 alert("দয়া করে ১ থেকে ১৫ এর মধ্যে একটি সংখ্যা দিন।");
             }
@@ -568,7 +600,7 @@
             const newName = prompt("নতুন নাম লিখুন:");
             if (newName && newName.trim() !== "") {
                 names.push(newName.trim());
-                renderNameList();
+                saveSettingsToDB(); // ডাটাবেসে সেভ হচ্ছে
             }
         }
 
@@ -576,14 +608,14 @@
             const updatedName = prompt("নাম পরিবর্তন করুন:", names[index]);
             if (updatedName && updatedName.trim() !== "") {
                 names[index] = updatedName.trim();
-                renderNameList();
+                saveSettingsToDB(); // ডাটাবেসে সেভ হচ্ছে
             }
         }
 
         function deleteName(index) {
             if (confirm(`আপনি কি "${names[index]}" নাম মুছে ফেলতে চান?`)) {
                 names.splice(index, 1);
-                renderNameList();
+                saveSettingsToDB(); // ডাটাবেসে সেভ হচ্ছে
             }
         }
 
@@ -610,7 +642,6 @@
                     cookStatus: cookStatusInput,
                     day: dayInput,
                     name: selectedName,
-                    // ইউজারের দেওয়া তারিখটিকে Timestamp হিসেবে সেভ করা হচ্ছে, যাতে সর্টিং ঠিক থাকে
                     createdAt: dateObj 
                 });
 
