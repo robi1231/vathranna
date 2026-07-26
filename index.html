@@ -343,7 +343,8 @@
                     
                     <div class="form-group full-width">
                         <label for="dateTime">তারিখ ও সময়:</label>
-                        <input type="datetime-local" id="dateTime" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                        <!-- readonly এবং disabled স্টাইল রিমুভ করা হয়েছে যাতে ইউজার এডিট করতে পারে -->
+                        <input type="datetime-local" id="dateTime" required>
                     </div>
 
                     <div class="form-group">
@@ -394,7 +395,6 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <!-- তারিখ কলামের জায়গা 42% করা হলো যাতে কোনোভাবেই লাইন না ভাঙে -->
                         <th style="width: 42%;">তারিখ</th>
                         <th style="width: 25%;">রান্না হ্যাঁ/না</th>
                         <th style="width: 15%;">নাম</th>
@@ -413,7 +413,6 @@
         <div class="modal-content">
             <h3 style="margin-top:0; text-align:center; color:#1a237e; margin-bottom: 15px;">সেটিংস প্যানেল</h3>
             
-            <!-- সাইকেল সেটআপ (ডাইনামিক গ্যাপ এবং লাল রঙের জন্য) -->
             <div class="setup-section">
                 <label style="font-size: 13px; font-weight: 700; color: #374151;">সাইকেলের দিন (১-১৫):</label>
                 <input type="number" id="cycleDurationInput" min="1" max="15" value="6">
@@ -433,7 +432,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCzssLwY4H2_qZbpeCdF-tD2Fadjv7hkjA",
             authDomain: "bazar-5642d.firebaseapp.com",
@@ -446,11 +444,8 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        // 🔒 সিকিউরিটি পাসওয়ার্ড
         const MASTER_PASSWORD = "123";
 
-        // ডিফল্ট নামের তালিকা ও সাইকেল ডিউরেশন
         let names = JSON.parse(localStorage.getItem('cookingNames')) || ['রবি', 'নাদিম', 'সাদিক', 'তানজিল', 'বশির'];
         let cycleDuration = parseInt(localStorage.getItem('cookingCycleDuration')) || 6;
         let allRecords = []; 
@@ -466,7 +461,6 @@
             renderNameDropdown();
         };
 
-        // ড্রপডাউন (অ্যাকর্ডিয়ন) টগল ফাংশন
         function toggleApp() {
             if (appCard.style.display === "none" || appCard.style.display === "") {
                 appCard.style.display = "block";
@@ -600,11 +594,13 @@
             submitBtn.innerText = 'সেভ হচ্ছে...';
             submitBtn.disabled = true;
 
+            const dateTimeInput = document.getElementById('dateTime').value;
             const cookStatusInput = document.getElementById('cookStatus').value;
             const dayInput = document.getElementById('day').value;
             const selectedName = nameSelect.value;
 
-            const dateObj = new Date();
+            // ইউজারের সিলেক্ট করা তারিখ অনুযায়ী ডেটা প্রসেস করা হচ্ছে
+            const dateObj = new Date(dateTimeInput);
             const formattedDate = dateObj.toLocaleDateString('en-GB') + ' ' + 
                                   dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
@@ -614,7 +610,8 @@
                     cookStatus: cookStatusInput,
                     day: dayInput,
                     name: selectedName,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    // ইউজারের দেওয়া তারিখটিকে Timestamp হিসেবে সেভ করা হচ্ছে, যাতে সর্টিং ঠিক থাকে
+                    createdAt: dateObj 
                 });
 
                 cookingForm.reset();
@@ -641,7 +638,6 @@
             records.forEach((data, index) => {
                 const row = document.createElement('tr');
 
-                // nowrap এবং ফন্ট সাইজ 10.5px দেওয়া হয়েছে, যাতে কোনোভাবেই না ভাঙে
                 row.innerHTML = `
                     <td style="white-space: nowrap; font-size: 10.5px; padding: 12px 2px;">${data.formattedDate || '-'}</td>
                     <td style="font-size: 11px; padding: 12px 2px;">${data.day ? data.day + ' (' + data.cookStatus + ')' : data.cookStatus}</td>
