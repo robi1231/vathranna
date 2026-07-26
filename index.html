@@ -394,9 +394,10 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th style="width: 35%;">তারিখ</th>
-                        <th style="width: 27%;">রান্না হ্যাঁ/না</th>
-                        <th style="width: 18%;">নাম</th>
+                        <!-- তারিখ কলামের জায়গা বাড়িয়ে দেওয়া হলো -->
+                        <th style="width: 38%;">তারিখ</th>
+                        <th style="width: 25%;">রান্না হ্যাঁ/না</th>
+                        <th style="width: 17%;">নাম</th>
                         <th style="width: 20%;">অ্যাকশন</th>
                     </tr>
                 </thead>
@@ -640,8 +641,9 @@
             records.forEach((data, index) => {
                 const row = document.createElement('tr');
 
+                // white-space: nowrap এবং ফন্ট সাইজ ১১px ব্যবহার করে PM নিছে নামা বন্ধ করা হলো
                 row.innerHTML = `
-                    <td>${data.formattedDate || '-'}</td>
+                    <td style="white-space: nowrap; font-size: 11px; padding: 12px 2px;">${data.formattedDate || '-'}</td>
                     <td>${data.day ? data.day + ' (' + data.cookStatus + ')' : data.cookStatus}</td>
                     <td>${data.name}</td>
                     <td>
@@ -690,4 +692,3 @@
     </script>
 </body>
 </html>
-
