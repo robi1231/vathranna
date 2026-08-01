@@ -445,7 +445,7 @@
         const db = firebase.firestore();
         const MASTER_PASSWORD = "123";
 
-        // লোকাল স্টোরেজ থেকে ডিফল্ট ভ্যালু লোড করা, না থাকলে ডিফল্ট এরে বসবে
+        // লোকাল স্টোরেজ থেকে ডিফল্ট ভ্যালু লোড করা
         let names = JSON.parse(localStorage.getItem('cookingNames')) || ['রবি', 'নাদিম', 'সাদিক', 'তানজিল', 'বশির'];
         let cycleDuration = parseInt(localStorage.getItem('cookingCycleDuration')) || 6;
         let allRecords = []; 
@@ -474,7 +474,6 @@
                     localStorage.setItem('cookingCycleDuration', cycleDuration);
                 }
                 
-                // ডাটাবেস আপডেট হওয়ার সাথে সাথে UI আপডেট হবে
                 renderNameDropdown();
                 if (allRecords.length > 0) renderTableData(allRecords);
                 
@@ -489,11 +488,9 @@
 
         // সেটিংস ডাটাবেসে সেভ করার ফাংশন
         async function saveSettingsToDB() {
-            // প্রথমত লোকাল স্টোরেজে ব্যাকআপ হিসেবে সেভ করা হলো
             localStorage.setItem('cookingNames', JSON.stringify(names));
             localStorage.setItem('cookingCycleDuration', cycleDuration);
 
-            // এরপর ডাটাবেসে পুশ করা হলো
             try {
                 await db.collection('app_settings').doc('general_config').set({
                     names: names,
@@ -691,11 +688,9 @@
                 `;
                 tableBody.appendChild(row);
 
-                // সাইকেল হিসাব: সব সময় প্রথম থেকে (oldest to newest) নির্দিষ্ট থাকবে
-                const chronIndex = records.length - index;
-                
-                if (chronIndex > 1 && (chronIndex - 1) % cycleDuration === 0) {
-                    const cycleNum = (chronIndex - 1) / cycleDuration;
+                // সাইকেল হিসাব: ক্রমানুসারে (asc order-এ) সাইকেল গণনা করা হচ্ছে
+                if ((index + 1) % cycleDuration === 0) {
+                    const cycleNum = (index + 1) / cycleDuration;
                     const gapRow = document.createElement('tr');
                     gapRow.className = 'gap-row';
                     gapRow.innerHTML = `<td colspan="4">--- সাইকেল ${cycleNum} সম্পন্ন ---</td>`;
@@ -704,8 +699,9 @@
             });
         }
 
+        // 🌟 'asc' (ascending) যোগ করা হয়েছে যাতে পুরনো তারিখ শুরুতে এবং নতুন তারিখ শেষে আসে
         db.collection('cooking_sheet_records')
-          .orderBy('createdAt', 'desc')
+          .orderBy('createdAt', 'asc')
           .onSnapshot((snapshot) => {
               allRecords = [];
               snapshot.forEach((doc) => {
@@ -716,12 +712,14 @@
               
               renderTableData(allRecords);
               renderNameDropdown(); 
+              
+              // টেবিল লোড হলে স্বয়ংক্রিয়ভাবে নিচে স্ক্রল হয়ে যাওয়ার অপশন (ঐচ্ছিক)
+              // window.scrollTo(0, document.body.scrollHeight);
           }, (error) => {
               console.error("ডাটা লোড করতে সমস্যা: ", error);
           });
 
         async function deleteRecord(id) {
-            // ডিলিটের সময় পাসওয়ার্ড রিমুভ করা হয়েছে, শুধু কনফার্মেশন রাখা হয়েছে
             if (confirm('আপনি কি সত্যিই এই ডাটা ডিলিট করতে চান?')) {
                 try {
                     await db.collection('cooking_sheet_records').doc(id).delete();
