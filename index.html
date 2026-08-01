@@ -581,7 +581,7 @@
                 cycleDuration = val;
                 renderTableData(allRecords); 
                 renderNameDropdown();
-                saveSettingsToDB(); // ডাটাবেসে সেভ হচ্ছে
+                saveSettingsToDB(); 
                 alert(`সাইকেল ${cycleDuration} দিনের জন্য সেভ করা হয়েছে!`);
             } else {
                 alert("দয়া করে ১ থেকে ১৫ এর মধ্যে একটি সংখ্যা দিন।");
@@ -609,9 +609,9 @@
             const newName = prompt("নতুন নাম লিখুন:");
             if (newName && newName.trim() !== "") {
                 names.push(newName.trim());
-                renderNameList(); // সাথে সাথে লিস্টে আপডেট হবে
-                renderNameDropdown(); // ড্রপডাউনে আপডেট হবে
-                saveSettingsToDB(); // ডাটাবেসে সেভ হবে
+                renderNameList(); 
+                renderNameDropdown(); 
+                saveSettingsToDB(); 
             }
         }
 
@@ -678,8 +678,6 @@
                 return;
             }
 
-            let entryCount = 0;
-
             records.forEach((data, index) => {
                 const row = document.createElement('tr');
 
@@ -693,12 +691,14 @@
                 `;
                 tableBody.appendChild(row);
 
-                entryCount++;
+                // সাইকেল হিসাব: সব সময় প্রথম থেকে (oldest to newest) নির্দিষ্ট থাকবে
+                const chronIndex = records.length - index;
                 
-                if (entryCount % cycleDuration === 0 && entryCount !== records.length) {
+                if (chronIndex > 1 && (chronIndex - 1) % cycleDuration === 0) {
+                    const cycleNum = (chronIndex - 1) / cycleDuration;
                     const gapRow = document.createElement('tr');
                     gapRow.className = 'gap-row';
-                    gapRow.innerHTML = `<td colspan="4">--- ${cycleDuration} দিনের সাইকেল সম্পন্ন ---</td>`;
+                    gapRow.innerHTML = `<td colspan="4">--- সাইকেল ${cycleNum} সম্পন্ন ---</td>`;
                     tableBody.appendChild(gapRow);
                 }
             });
@@ -721,10 +721,10 @@
           });
 
         async function deleteRecord(id) {
-            if (authenticate()) {
+            // ডিলিটের সময় পাসওয়ার্ড রিমুভ করা হয়েছে, শুধু কনফার্মেশন রাখা হয়েছে
+            if (confirm('আপনি কি সত্যিই এই ডাটা ডিলিট করতে চান?')) {
                 try {
                     await db.collection('cooking_sheet_records').doc(id).delete();
-                    alert('ডাটা সফলভাবে ডিলিট হয়েছে!');
                 } catch (error) {
                     alert('ডিলিট সম্ভব হয়নি: ' + error.message);
                 }
